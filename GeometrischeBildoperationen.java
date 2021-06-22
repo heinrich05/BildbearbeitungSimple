@@ -39,6 +39,7 @@ public class GeometrischeBildoperationen  extends Bildoperationen
             case OP_SpiegelHorizontal: return spiegelHorizontal(originalbild);
             case OP_SpiegelVertikal: return spiegelVertikal(originalbild);
             case OP_DreheLinks: return dreheLinks(originalbild);
+            case OP_DreheRechts: return dreheRechts(originalbild);
             default: return originalbild.copy();
         }
     }
@@ -121,7 +122,47 @@ public class GeometrischeBildoperationen  extends Bildoperationen
     }
     
     private PImage dreheLinks( PImage originalbild ){
-        return originalbild.copy();
+        int breiteAlt = originalbild.width;
+        int hoeheAlt = originalbild.height;
+        
+        int breiteNeu = hoeheAlt;
+        int hoeheNeu = breiteAlt;
+        
+        int[][] pixel = pixelsExplode(originalbild.pixels, breiteAlt, hoeheAlt);
+        int[][] pixelNeu = new int[breiteNeu][hoeheNeu]; 
+        
+        for(int x=0; x < breiteNeu; x++) {
+            for(int y=0;y < hoeheNeu; y++) {
+                pixelNeu[x][y] = pixel[(breiteAlt-1)-y][x];
+            }
+        }
+        PImage neuesBild = originalbild.copy();
+        neuesBild.pixels= pixelsFlatten(pixelNeu); 
+        return neuesBild;
     }
     
+    public void dreheRechts( Picture originalbild) {
+        this.op = OP_DreheRechts;
+        originalbild.runOp( this );
+    }
+
+    private PImage dreheRechts( PImage originalbild ){
+        int breiteAlt = originalbild.width;
+        int hoeheAlt = originalbild.height;
+        
+        int breiteNeu = hoeheAlt;
+        int hoeheNeu = breiteAlt;
+        
+        int[][] pixel = pixelsExplode(originalbild.pixels, breiteAlt, hoeheAlt);
+        int[][] pixelNeu = new int[breiteNeu][hoeheNeu]; 
+        
+        for(int x=0; x < breiteNeu; x++) {
+            for(int y=0;y < hoeheNeu; y++) {
+                pixelNeu[x][y] = pixel[y][(hoeheAlt-1)-x];
+            }
+        }
+        PImage neuesBild = originalbild.copy();
+        neuesBild.pixels= pixelsFlatten(pixelNeu); 
+        return neuesBild;
+    }
 }
