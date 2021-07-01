@@ -115,6 +115,7 @@ public class GeometrischeBildoperationen  implements Bildoperation
     public Picture dreheLinks( Picture originalBild) {
         //@TODO: Kopiere Code aus einer der bereits implementierten Operationen und passe entprechend an.
         return originalBild.copy();
+
     }
 
 }
