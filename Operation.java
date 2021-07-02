@@ -6,7 +6,7 @@
  * @version 06.2021
  */
 @FunctionalInterface
-public interface  Bildoperation
+public interface  Operation
 {
 
     /**

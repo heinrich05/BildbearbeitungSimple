@@ -175,11 +175,11 @@ public class Picture
     }
 
     /**
-     * Wendet eine Bildoperation auf das Bild an
+     * Wendet eine Operation auf das Bild an
      *
      * @param op Die anzuwendende Operation
      */
-    public void applyOperation(Bildoperation op)
+    public void applyOperation(Operation op)
     {
         Picture pic = op.apply(this);
         setWidth(pic.width.get());
@@ -206,6 +206,9 @@ public class Picture
         PApplet.runSketch(new String[]{"sketch"}, sketch);  
         if( Objects.nonNull(this.initialImg) && this.initialImg != "" ){
             load(initialImg);
+        } else {
+            this.sizeChanged.set(!this.sizeChanged.get()); //invalidate sizeChangedProperty
+            this.pixelsChanged.set(!this.pixelsChanged.get()); //invalidate pixelsChangedProperty
         }
     }
 
