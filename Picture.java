@@ -76,7 +76,7 @@ public class Picture
         return pixelsExplode(getPixels(), this.getWidth(), this.getHeight());
     }
 
-    public Color[][] getPixelsColorTable()
+    public Color[][] getPixelsTableColor()
     {
         return pixelsColorExplode(getPixels(), this.getWidth(), this.getHeight());
     }
