@@ -114,26 +114,7 @@ public class GeometrischeBildoperationen  implements Bildoperation
      */
     public Picture dreheLinks( Picture originalBild) {
         //@TODO: Kopiere Code aus einer der bereits implementierten Operationen und passe entprechend an.
-       // return originalBild.copy();
-    int breiteAlt = originalBild.getWidth();
-        int hoeheAlt  = originalBild.getHeight();
-        
-        int breiteNeu = hoeheAlt;
-        int hoeheNeu = breiteAlt;
-
-        int[][] pixelAlt = originalBild.getPixelsTable();
-        int[][] pixelNeu = new int[breiteNeu][hoeheNeu];
-
-        for(int x=0; x < breiteNeu; x++) {
-            for(int y=0;y < hoeheNeu; y++) {
-                pixelNeu[x][y] = pixelAlt[(breiteAlt-1)-y][x];
-            }
-        }
-        Picture neuesBild = originalBild.copy();
-        neuesBild.setWidth(breiteNeu);
-        neuesBild.setHeight(hoeheNeu);
-        neuesBild.setPixels(pixelNeu); 
-        return neuesBild;
+        return originalBild.copy();
     }
 
 }
