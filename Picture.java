@@ -3,6 +3,10 @@ import processing.core.PImage;
 import java.util.Objects;
 import java.io.File;
 import javafx.scene.paint.Color;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * Ein Bild.
@@ -13,11 +17,13 @@ import javafx.scene.paint.Color;
 public class Picture
 {
     protected Sketch sketch;
-    private PImage displayImg;
+
     private String initialImg;
-    private int width = 600;
-    private int height = 400;
+    private IntegerProperty width = new SimpleIntegerProperty(600);
+    private IntegerProperty height = new SimpleIntegerProperty(400);
     private int[] pixels;
+    private BooleanProperty pixelsChanged = new SimpleBooleanProperty(false); 
+    private BooleanProperty sizeChanged = new SimpleBooleanProperty(false); 
 
     /**
      * Picture Konstruktor
@@ -45,12 +51,12 @@ public class Picture
      *
      * @return Ein eindimensionales Array
      */
-    public int[] getPixelsArray()
+    public int[] getPixels()
     {
         return this.pixels;
     }
 
-    public Color[] getPixelsColorArray()
+    public Color[] getPixelsColor()
     {
         Color[] pixels= new Color[this.pixels.length];
 
@@ -67,12 +73,12 @@ public class Picture
      */
     public int[][] getPixelsTable()
     {
-        return pixelsExplode(this.pixels, this.width, this.height);
+        return pixelsExplode(getPixels(), this.getWidth(), this.getHeight());
     }
 
     public Color[][] getPixelsColorTable()
     {
-        return pixelsColorExplode(this.pixels, this.width, this.height);
+        return pixelsColorExplode(getPixels(), this.getWidth(), this.getHeight());
     }
 
     /**
@@ -80,14 +86,14 @@ public class Picture
      *
      * @param pixelsArray Ein zweidimensionales Array.
      */
-    public void setPixelsArray( int[][] pixelsTable )
+    public void setPixels( int[][] pixelsTable )
     {
-        setPixelsArray(pixelsFlatten(pixelsTable));
+        setPixels(pixelsFlatten(pixelsTable));
     }
 
-    public void setPixelsArray( Color[][] pixelsTable )
+    public void setPixels( Color[][] pixelsTable )
     {
-        setPixelsArray(pixelsFlatten(pixelsTable));
+        setPixels(pixelsFlatten(pixelsTable));
     }
 
     /**
@@ -95,11 +101,15 @@ public class Picture
      *
      * @param pixelsArray Ein eindimensionales Array.
      */
-    public void setPixelsArray( int[] pixelsArray )
+    public void setPixels( int[] pixelsArray )
     {
-        if (isDisplay()) displayImg.loadPixels();
         this.pixels = pixelsArray; 
-        if (isDisplay()) displayImg.updatePixels();
+        this.pixelsChanged.set(!this.pixelsChanged.get()); //invalidate pixelsChanged
+    }
+
+    public IntegerProperty widthProperty()
+    {
+        return this.width;
     }
 
     /**
@@ -109,7 +119,19 @@ public class Picture
      */
     public int getWidth()
     {
-        return this.width;
+        return this.width.get();
+    }
+
+    public void setWidth(int width)
+    {
+        this.width.set(width);
+        this.sizeChanged.set(!this.sizeChanged.get()); //invalidate sizeChangedProperty
+
+    }
+
+    public IntegerProperty heightProperty()
+    {
+        return this.height;
     }
 
     /**
@@ -119,19 +141,23 @@ public class Picture
      */
     public int getHeight()
     {
-        return this.height;
+        return this.height.get();
     }
 
-    /**
-     * Setter für die Breite und Höhe des Bildes
-     *
-     * @param width Breite
-     * @param height Höhe
-     */
-    public void setDimensions (int width, int height)
+    public void setHeight(int height)
     {
-        this.width = width;
-        this.height = height;
+        this.height.set(height);
+        this.sizeChanged.set(!this.sizeChanged.get()); //invalidate sizeChangedProperty
+    }
+
+    public BooleanProperty pixelsChangedProperty()
+    {
+        return this.pixelsChanged;
+    }
+
+    public BooleanProperty sizeChangedProperty()
+    {
+        return this.sizeChanged;
     }
 
     /**
@@ -142,8 +168,9 @@ public class Picture
     public Picture copy()
     {
         Picture cpy = new Picture();
-        cpy.setDimensions(this.width, this.height);
-        cpy.setPixelsArray(this.pixels.clone());
+        cpy.setHeight(getHeight());
+        cpy.setWidth(getWidth());
+        cpy.setPixels(getPixels().clone());
         return cpy;
     }
 
@@ -155,12 +182,9 @@ public class Picture
     public void applyOperation(Bildoperation op)
     {
         Picture pic = op.apply(this);
-        width = pic.width;
-        height = pic.height;
-        pixels = pic.pixels;
-        if( isDisplay() ){
-            updateDisplay(); 
-        }
+        setWidth(pic.width.get());
+        setHeight(pic.height.get());
+        setPixels(pic.pixels);
     }
 
     /*** View Methoden (beeinflussen die Anzeige) ***/
@@ -178,15 +202,13 @@ public class Picture
         if( isDisplay() ) return;
 
         sketch = new Sketch();
-        sketch.width = this.width;
-        sketch.height = this.height;
+        sketch.setPicture(this);
         PApplet.runSketch(new String[]{"sketch"}, sketch);  
         if( Objects.nonNull(this.initialImg) && this.initialImg != "" ){
             load(initialImg);
-        } else { 
-            updateDisplay();
         }
     }
+
 
     /**
      * Läd ein Bild aus dem images Ordner
@@ -197,11 +219,11 @@ public class Picture
     public void load(String dateiname) {
         //@FEATURE-REQUEST: enable without sketch
         if( !isDisplay()) return;
-        sketch.load("images/"+dateiname); 
-        displayImg = sketch.readImage();
-        width = displayImg.width;
-        height = displayImg.height;
-        pixels = displayImg.pixels;
+        sketch.load("images/"+dateiname);
+        PImage displayImg = sketch.readImage();
+        setWidth(displayImg.width);
+        setHeight(displayImg.height);
+        setPixels(displayImg.pixels);
     }
 
     /**
@@ -214,11 +236,6 @@ public class Picture
         //@FEATURE-REQUEST: enable without sketch
         if( !isDisplay()) return;
         sketch.save( new File("images/"+dateiname).getAbsolutePath() );
-    }
-
-    private void updateDisplay()
-    {  
-        if (isDisplay()) sketch.updateImage(width, height, pixels);  
     }
 
     /*** Statische Methoden (auch ohne konkretes Bildobjekt von außen nutzbar) ***/
