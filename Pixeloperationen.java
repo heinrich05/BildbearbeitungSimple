@@ -54,20 +54,25 @@ public class Pixeloperationen  implements Bildoperation
     //    und erstelle falls nötig eine neue Konstante "int OP_meineGeometrischeOperation".
     //
 
-    /** 
-     * Spiegelt das Bild, so dass rechts und links getauscht werden
-     * @param originalBild Ein Bild (Picture), das gespiegelt werden soll
-     */
+    
     public Picture graustufenDurchschnitt(Picture originalBild) {
         int breite = originalBild.getWidth();
         int hoehe  = originalBild.getHeight();
 
-        int[][] pixel = originalBild.getPixelsTable();
-        int[][] pixelNeu = new int[breite][hoehe];
+        Color[][] pixel = originalBild.getPixelsTable();
+        Color[][] pixelNeu = new Color[breite][hoehe];
 
         for(int x=0; x < breite; x++) {
             for(int y=0;y < hoehe; y++) {
-                pixelNeu[x][y] = pixel[(breite-1)-x][y];
+                int rot = pixel.getRed[x][y];
+                int grün = pixel.getGreen[x][y];
+                int blau = pixel.getBlau[x][y];
+                
+                int durchschnitt = (rot+grün+blau)/3;
+                
+                grau = new Color(durchschnitt,durchschnitt,durchschnitt);
+                
+                pixelNeu[x][y] = grau;
             }
         }
         Picture neuesBild = originalBild.copy();
