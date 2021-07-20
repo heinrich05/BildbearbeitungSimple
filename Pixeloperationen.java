@@ -1,4 +1,5 @@
 import java.util.Random;
+import javafx.scene.paint.Color;
 
 /**
  * Algorithmen zur Änderung der Pixelpositionen eines Pictures
